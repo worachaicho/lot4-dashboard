@@ -7,43 +7,27 @@ export default function handler(req, res) {
 
     const workbook = XLSX.readFile(filePath);
     const sheet = workbook.Sheets["Lot4"];
+
+    if (!sheet) {
+      return res.status(500).json({ error: "Sheet Lot4 not found" });
+    }
+
     const data = XLSX.utils.sheet_to_json(sheet);
 
     const qcField = "QC Status (Linux&Win10)";
 
-    // ✅ normalize function
-    const normalize = (v) =>
-      (v || "").toString().trim().toLowerCase();
-
+    let total = data.length;
     let pass = 0;
     let fail = 0;
     let inprogress = 0;
     let blocked = 0;
+    let unknown = 0;
 
     data.forEach(row => {
-      const status = normalize(row[qcField]);
+      let raw = row[qcField];
 
-      if (status.includes("pass") || status.includes("complete"))
-        pass++;
-      else if (status.includes("fail"))
-        fail++;
-      else if (status.includes("progress"))
-        inprogress++;
-      else if (status.includes("block"))
-        blocked++;
-    });
+      if (!raw) {
+        unknown++;
+        return;
+      }
 
-    const total = data.length;
-
-    const passPercent =
-      total > 0 ? ((pass / total) * 100).toFixed(1) : 0;
-
-    res.json({
-      summary: { total, pass, fail, inprogress, blocked },
-      passPercent
-    });
-
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
