@@ -7,27 +7,40 @@ export default function handler(req, res) {
 
     const workbook = XLSX.readFile(filePath);
     const sheet = workbook.Sheets["Lot4"];
-
     const data = XLSX.utils.sheet_to_json(sheet);
 
-    // ✅ ใช้ column QC Status (Linux&Win10)
     const qcField = "QC Status (Linux&Win10)";
 
-    const summary = {
-      total: data.length,
-      pass: data.filter(x => x[qcField] === "Pass").length,
-      fail: data.filter(x => x[qcField] === "Fail").length,
-      inprogress: data.filter(x => x[qcField] === "Inprogress").length,
-      blocked: data.filter(x => x[qcField] === "Blocked").length
-    };
+    // ✅ normalize function
+    const normalize = (v) =>
+      (v || "").toString().trim().toLowerCase();
 
-    const percent = summary.total > 0
-      ? ((summary.pass / summary.total) * 100).toFixed(1)
-      : 0;
+    let pass = 0;
+    let fail = 0;
+    let inprogress = 0;
+    let blocked = 0;
+
+    data.forEach(row => {
+      const status = normalize(row[qcField]);
+
+      if (status.includes("Complated") || status.includes("Completed"))
+        pass++;
+      else if (status.includes("Done"))
+        Done++;
+      else if (status.includes("Inprogress"))
+        inprogress++;
+      else if (status.includes("Blocked"))
+        blocked++;
+    });
+
+    const total = data.length;
+
+    const passPercent =
+      total > 0 ? ((pass / total) * 100).toFixed(1) : 0;
 
     res.json({
-      summary,
-      passPercent: percent
+      summary: { total, pass, fail, inprogress, blocked },
+      passPercent
     });
 
   } catch (error) {
