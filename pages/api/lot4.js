@@ -8,21 +8,27 @@ export default function handler(req, res) {
     const workbook = XLSX.readFile(filePath);
     const sheet = workbook.Sheets["Lot4"];
 
-    if (!sheet) {
-      return res.status(500).json({ error: "Sheet Lot4 not found" });
-    }
-
     const data = XLSX.utils.sheet_to_json(sheet);
 
-    const result = {
+    // ✅ ใช้ column QC Status (Linux&Win10)
+    const qcField = "QC Status (Linux&Win10)";
+
+    const summary = {
       total: data.length,
-      completed: data.filter(x => x.L4_Status === "Completed").length,
-      done: data.filter(x => x.L4_Status === "Done").length,
-      inprogress: data.filter(x => x.L4_Status === "Inprogress").length,
-      blocked: data.filter(x => x.L4_Status === "Blocked").length
+      pass: data.filter(x => x[qcField] === "Pass").length,
+      fail: data.filter(x => x[qcField] === "Fail").length,
+      inprogress: data.filter(x => x[qcField] === "Inprogress").length,
+      blocked: data.filter(x => x[qcField] === "Blocked").length
     };
 
-    res.json(result);
+    const percent = summary.total > 0
+      ? ((summary.pass / summary.total) * 100).toFixed(1)
+      : 0;
+
+    res.json({
+      summary,
+      passPercent: percent
+    });
 
   } catch (error) {
     res.status(500).json({ error: error.message });
