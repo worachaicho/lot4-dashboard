@@ -2,6 +2,13 @@
   "name": "lot4-dashboard",
   "private": true,
   "scripts": {
-    "build": "echo build success"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "13.4.19",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   }
 }
