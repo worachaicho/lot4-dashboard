@@ -23,13 +23,13 @@ export default function handler(req, res) {
     data.forEach(row => {
       const status = normalize(row[qcField]);
 
-      if (status.includes("Complated") || status.includes("Completed"))
+      if (status.includes("pass") || status.includes("complete"))
         pass++;
-      else if (status.includes("Done"))
-        Done++;
-      else if (status.includes("Inprogress"))
+      else if (status.includes("fail"))
+        fail++;
+      else if (status.includes("progress"))
         inprogress++;
-      else if (status.includes("Blocked"))
+      else if (status.includes("block"))
         blocked++;
     });
 
