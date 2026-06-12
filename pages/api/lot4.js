@@ -11,7 +11,7 @@ export default function handler(req, res) {
     const data = XLSX.utils.sheet_to_json(sheet);
 
     // ✅ เปลี่ยนตรงนี้
-    const qcField = "BU";
+    const qcField = "QC Status";
 
     let total = data.length;
     let pass = 0;
