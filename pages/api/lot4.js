@@ -8,13 +8,10 @@ export default function handler(req, res) {
     const workbook = XLSX.readFile(filePath);
     const sheet = workbook.Sheets["Lot4"];
 
-    if (!sheet) {
-      return res.status(500).json({ error: "Sheet Lot4 not found" });
-    }
-
     const data = XLSX.utils.sheet_to_json(sheet);
 
-    const qcField = "QC Status (Linux&Win10)";
+    // ✅ เปลี่ยนตรงนี้
+    const qcField = "BU";
 
     let total = data.length;
     let pass = 0;
@@ -25,6 +22,7 @@ export default function handler(req, res) {
 
     data.forEach(row => {
       const raw = row[qcField];
+
       if (!raw) {
         unknown++;
         return;
