@@ -8,10 +8,6 @@ export default function handler(req, res) {
     const workbook = XLSX.readFile(filePath);
     const sheet = workbook.Sheets["Lot4"];
 
-    if (!sheet) {
-      return res.status(500).json({ error: "Sheet Lot4 not found" });
-    }
-
     const data = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
     const qcField = "QCStatus";
@@ -34,15 +30,18 @@ export default function handler(req, res) {
         return;
       }
 
-      const status = String(raw).trim();
+      // ✅ FIX CORE IMPORTANT
+      const status = String(raw).trim().toLowerCase();
 
-      if (status === "Done") Done++;
-      else if (status === "Completed") Completed++;
-      else if (status === "Inprogress") Inprogress++;
-      else if (status === "Blocked") Blocked++;
-      else if (status === "To Do" || status === "Todo") ToDo++;
+      if (status === "done") Done++;
+      else if (status === "completed") Completed++;
+      else if (status === "inprogress") Inprogress++;
+      else if (status === "blocked") Blocked++;
+      else if (status === "to do" || status === "todo") ToDo++;
       else Unknown++;
     });
+
+    const pass = Done + Completed;
 
     res.status(200).json({
       summary: {
@@ -52,9 +51,9 @@ export default function handler(req, res) {
         Inprogress,
         Blocked,
         ToDo,
-        Unknown
+        Unknown,
       },
-      pass: Completed + Done
+      pass,
     });
 
   } catch (err) {
