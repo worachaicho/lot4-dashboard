@@ -30,10 +30,11 @@ export default function handler(req, res) {
 
       const status = String(raw).trim().toLowerCase();
 
-      if (status.includes("pass") || status.includes("complete")) pass++;
-      else if (status.includes("fail")) fail++;
-      else if (status.includes("progress")) inprogress++;
-      else if (status.includes("block")) blocked++;
+      if (status.includes("Completed") || status.includes("Completed")) Completed++;
+      else if (status.includes("Done")) Done++;
+      else if (status.includes("Inprogress")) Inprogress++;
+      else if (status.includes("Blocked")) Blocked++;
+      else if (status.includes("To Do")) To Do++;
       else unknown++;
     });
 
