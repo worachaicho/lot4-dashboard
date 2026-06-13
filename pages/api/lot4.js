@@ -3,7 +3,6 @@ const path = require("path");
 
 export default function handler(req, res) {
   try {
-    // ✅ path ของไฟล์
     const filePath = path.join(process.cwd(), "data", "lot4.xlsx");
 
     const workbook = XLSX.readFile(filePath);
@@ -13,13 +12,12 @@ export default function handler(req, res) {
       return res.status(500).json({ error: "Sheet 'Lot4' not found" });
     }
 
-    const data = XLSX.utils.sheet_to_json(sheet);
+    // ✅ VERY IMPORTANT: กันค่า undefined
+    const data = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
-    // ✅ ใช้ column BU ตาม requirement
     const qcField = "QCStatus";
 
-    // ✅ initialize counters
-    let total = data.length;
+    let total = 0;
     let pass = 0;
     let fail = 0;
     let inprogress = 0;
@@ -27,7 +25,9 @@ export default function handler(req, res) {
     let todo = 0;
     let unknown = 0;
 
-    data.forEach(row => {
+    data.forEach((row) => {
+      total++;
+
       const raw = row[qcField];
 
       if (!raw) {
@@ -35,7 +35,6 @@ export default function handler(req, res) {
         return;
       }
 
-      // ✅ normalize กัน case / space / format เพี้ยน
       const status = String(raw).trim().toLowerCase();
 
       if (status.includes("completed") || status.includes("done")) {
@@ -53,3 +52,23 @@ export default function handler(req, res) {
       }
     });
 
+    const passPercent =
+      total > 0 ? ((pass / total) * 100).toFixed(1) : "0.0";
+
+    res.status(200).json({
+      summary: {
+        total,
+        pass,
+        fail,
+        inprogress,
+        blocked,
+        todo,
+        unknown,
+      },
+      passPercent,
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
