@@ -26,7 +26,7 @@ export default function Home() {
 
       {/* KPI */}
       <h2 style={{ color: getColor() }}>
-        {passPercent}% PASS
+        {passPercent}NSS Counter Service Test Report
       </h2>
 
       {/* Progress Bar */}
