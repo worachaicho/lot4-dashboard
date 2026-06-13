@@ -6,7 +6,7 @@ export default function handler(req, res) {
     const filePath = path.join(process.cwd(), "data", "lot4.xlsx");
 
     const workbook = XLSX.readFile(filePath);
-    const sheet = workbook.Sheets["Lot4"];
+    const sheet = workbook.Sheets["Sheet1"];
 
     const data = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
